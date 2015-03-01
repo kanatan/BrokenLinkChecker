@@ -21,6 +21,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	FileList file;
 	BrokenLinkList link;
 	JTextField adressBar=new JTextField("http://");
+	String base;
 
 	public AdressBar(FileList f,BrokenLinkList l) {
 		super(HORIZONTAL_SPLIT);
@@ -45,29 +46,36 @@ public class AdressBar extends JSplitPane implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		file.addPath(adressBar.getText());
+		base=adressBar.getText();
+		base=base.substring(0, base.lastIndexOf("/")+1);
+		file.addPath(base);
+		searchURL(base);
+	}
+
+	private void searchURL(String path){
+		System.out.println(path);
 		try {
 			URL url;
-			if(adressBar.getText().startsWith("http")){
-				url=new URL(adressBar.getText());
+			if(path.startsWith("http")){
+				url=new URL(path);
 			}
 			else{
-				url=new URL("file:///"+adressBar.getText());
+				url=new URL("file:///"+path);
 			}
 			URLConnection connection = url.openConnection();
 			InputStream inStream = connection.getInputStream();
 			BufferedReader input =new BufferedReader(new InputStreamReader(inStream));
-			String html="";
 			String str="";
 			while((str=input.readLine())!=null){
 				if(str.indexOf("<a")!=-1){
 					str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
 							str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
-					file.addPath(str);
-					html+=str+"\n";
+					path=path.substring(0, path.lastIndexOf("/")+1)+str;
+					file.addPath(path.substring(base.length()));
+					searchURL(path);
 				}
 			}
-			link.html.setText(html);
+			inStream.close();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

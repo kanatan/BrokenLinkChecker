@@ -18,11 +18,13 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
 public class AdressBar extends JSplitPane implements ActionListener{
+	FileList file;
 	BrokenLinkList link;
 	JTextField adressBar=new JTextField("http://");
 
-	public AdressBar(BrokenLinkList l) {
+	public AdressBar(FileList f,BrokenLinkList l) {
 		super(HORIZONTAL_SPLIT);
+		file=f;
 		link=l;
 		adressBar.addMouseListener(new MouseAdapter() {
 			@Override
@@ -43,6 +45,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
+		file.addPath(adressBar.getText());
 		try {
 			URL url;
 			if(adressBar.getText().startsWith("http")){
@@ -60,6 +63,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 				if(str.indexOf("<a")!=-1){
 					str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
 							str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
+					file.addPath(str);
 					html+=str+"\n";
 				}
 			}

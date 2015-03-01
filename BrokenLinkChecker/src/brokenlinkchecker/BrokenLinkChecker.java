@@ -6,13 +6,14 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 public class BrokenLinkChecker extends JFrame {
+	FileList file=new FileList();
 	BrokenLinkList link=new BrokenLinkList();
 	public BrokenLinkChecker(){
 		super("リンク切れチェッカー");
 		setSize(600,400);
 		setLocationRelativeTo(null);
-		add(new AdressBar(link),BorderLayout.NORTH);
-		JSplitPane pane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,new FileList(),link);
+		add(new AdressBar(file,link),BorderLayout.NORTH);
+		JSplitPane pane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,file,link);
 		pane.setDividerLocation(200);
 		pane.setDividerSize(1);
 		add(pane);

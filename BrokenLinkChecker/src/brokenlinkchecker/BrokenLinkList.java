@@ -1,18 +1,22 @@
 package brokenlinkchecker;
 
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 public class BrokenLinkList extends JScrollPane {
-	/*JTable table=new JTable();
-	DefaultTableModel list;*/
-	JTextArea html=new JTextArea();
+	JTable table=new JTable();
+	DefaultTableModel list;
 
 	public BrokenLinkList() {
-		/*String[] title={"URL","タイプ"};
+		String[] title={"URL","タイプ"};
 		list=new DefaultTableModel(title, 0);
 		table.setModel(list);
-		setViewportView(table);*/
-		setViewportView(html);
+		setViewportView(table);
+	}
+
+	public void addLink(String url,String type){
+		String[] row={url,type};
+		list.addRow(row);
 	}
 }

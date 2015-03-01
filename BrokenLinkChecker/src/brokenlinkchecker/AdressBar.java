@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,8 +49,13 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	public void actionPerformed(ActionEvent event) {
 		base=adressBar.getText();
 		base=base.substring(0, base.lastIndexOf("/")+1);
-		file.addPath(base);
-		searchURL(base);
+		new Thread(){
+			@Override
+			public void run(){
+				file.addPath(base);
+				searchURL(base);
+			}
+		}.start();
 	}
 
 	private void searchURL(String path){
@@ -63,19 +69,25 @@ public class AdressBar extends JSplitPane implements ActionListener{
 				url=new URL("file:///"+path);
 			}
 			URLConnection connection = url.openConnection();
-			InputStream inStream = connection.getInputStream();
-			BufferedReader input =new BufferedReader(new InputStreamReader(inStream));
-			String str="";
-			while((str=input.readLine())!=null){
-				if(str.indexOf("<a")!=-1){
-					str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
-							str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
-					path=path.substring(0, path.lastIndexOf("/")+1)+str;
-					file.addPath(path.substring(base.length()));
-					searchURL(path);
+			try{
+				InputStream inStream = connection.getInputStream();
+				if(path.endsWith("html") || path.endsWith("htm") || path.endsWith("/")){
+					BufferedReader input =new BufferedReader(new InputStreamReader(inStream));
+					String str="";
+					while((str=input.readLine())!=null){
+						if(str.indexOf("<a")!=-1){
+							str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
+									str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
+							path=path.substring(0, path.lastIndexOf("/")+1)+str;
+							file.addPath(path.substring(base.length()));
+							searchURL(path);
+						}
+					}
+					inStream.close();
 				}
+			} catch(FileNotFoundException e){
+				link.addLink(path.substring(base.length()),"ファイルが見つかりません。");
 			}
-			inStream.close();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

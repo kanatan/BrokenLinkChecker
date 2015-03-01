@@ -57,7 +57,11 @@ public class AdressBar extends JSplitPane implements ActionListener{
 			String html="";
 			String str="";
 			while((str=input.readLine())!=null){
-				html+=str+"\n";
+				if(str.indexOf("<a")!=-1){
+					str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
+							str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
+					html+=str+"\n";
+				}
 			}
 			link.html.setText(html);
 		} catch (MalformedURLException e) {

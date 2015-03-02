@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JSplitPane;
@@ -24,6 +26,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	private LinkSourceList lslist;
 	private JTextField adressBar=new JTextField("http://");
 	private String base;
+	private Vector<URL> check=new Vector<URL>();
 
 	public AdressBar(FileList f,BrokenLinkList b,LinkSourceList l) {
 		super(HORIZONTAL_SPLIT);
@@ -61,7 +64,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	}
 
 	private void searchURL(String path,String source){
-		System.out.println(path);
+		System.out.println("search:"+path);
 		try {
 			URL url;
 			if(path.startsWith("http")){
@@ -73,7 +76,9 @@ public class AdressBar extends JSplitPane implements ActionListener{
 			URLConnection connection = url.openConnection();
 			try{
 				InputStream inStream = connection.getInputStream();
-				if(path.endsWith("html") || path.endsWith("htm") || path.endsWith("/")){
+				if(check.contains(new URL(new URL(base),url.toString().substring(base.length())))==false &&
+						(path.endsWith("html") || path.endsWith("htm") || path.endsWith("/"))){
+					check.add(new URL(new URL(base),url.toString().substring(base.length())));
 					BufferedReader input =new BufferedReader(new InputStreamReader(inStream));
 					String str="";
 					while((str=input.readLine())!=null){
@@ -82,10 +87,17 @@ public class AdressBar extends JSplitPane implements ActionListener{
 									str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
 							String path2=path.substring(0, path.lastIndexOf("/")+1)+str;
 							flist.addPath(path2.substring(base.length()));
+							System.out.println("   hit:"+path2);
+							System.out.println("source:"+url.toString());
+							System.out.println();
 							searchURL(path2,url.toString().substring(base.length()));
 						}
 					}
 					inStream.close();
+				}
+				else{
+					System.out.println("  pass:"+url.toString());
+					System.out.println();
 				}
 			} catch(FileNotFoundException e){
 				bllist.addLink(path.substring(base.length()),"ファイルが見つかりません。");

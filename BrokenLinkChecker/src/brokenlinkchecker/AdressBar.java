@@ -53,12 +53,17 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		base=adressBar.getText();
-		base=base.substring(0, base.lastIndexOf("/")+1);
+		if(base.indexOf("\\")!=-1){
+			base=base.substring(0, base.lastIndexOf("\\")+1);
+		}
+		else{
+			base=base.substring(0, base.lastIndexOf("/")+1);
+		}
 		new Thread(){
 			@Override
 			public void run(){
-				flist.addPath(base);
-				searchURL(base,base);
+				flist.addPath(adressBar.getText());
+				searchURL(adressBar.getText(),adressBar.getText());
 			}
 		}.start();
 	}
@@ -67,18 +72,18 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		System.out.println("search:"+path);
 		try {
 			URL url;
-			if(path.startsWith("http")){
-				url=new URL(path);
+			if(path.startsWith("http") || path.startsWith("file")){
+				url=new URL(new URL(base),path.substring(base.length()));
 			}
 			else{
-				url=new URL("file:///"+path);
+				url=new URL(new URL("file:///"+base),path.substring(base.length()));
 			}
 			URLConnection connection = url.openConnection();
 			try{
 				InputStream inStream = connection.getInputStream();
-				if(check.contains(new URL(new URL(base),url.toString().substring(base.length())))==false &&
+				if(check.contains(url)==false &&
 						(path.endsWith("html") || path.endsWith("htm") || path.endsWith("/"))){
-					check.add(new URL(new URL(base),url.toString().substring(base.length())));
+					check.add(url);
 					BufferedReader input =new BufferedReader(new InputStreamReader(inStream));
 					String str="";
 					while((str=input.readLine())!=null){

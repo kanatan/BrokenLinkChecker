@@ -6,17 +6,21 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 public class BrokenLinkChecker extends JFrame {
-	FileList file=new FileList();
-	BrokenLinkList link=new BrokenLinkList();
 	public BrokenLinkChecker(){
 		super("リンク切れチェッカー");
 		setSize(600,400);
 		setLocationRelativeTo(null);
-		add(new AdressBar(file,link),BorderLayout.NORTH);
-		JSplitPane pane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,file,link);
-		pane.setDividerLocation(200);
+		LinkSourceList lslist=new LinkSourceList();
+		FileList flist=new FileList();
+		BrokenLinkList bllist=new BrokenLinkList(lslist);
+		add(new AdressBar(flist,bllist,lslist),BorderLayout.NORTH);
+		JSplitPane pane=new JSplitPane(JSplitPane.VERTICAL_SPLIT,bllist,lslist);
+		pane.setDividerLocation(250);
 		pane.setDividerSize(1);
-		add(pane);
+		JSplitPane pane2=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,flist,pane);
+		pane2.setDividerLocation(200);
+		pane2.setDividerSize(1);
+		add(pane2);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}

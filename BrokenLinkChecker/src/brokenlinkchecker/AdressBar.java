@@ -3,8 +3,8 @@ package brokenlinkchecker;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,18 +19,20 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
 public class AdressBar extends JSplitPane implements ActionListener{
-	FileList file;
-	BrokenLinkList link;
-	JTextField adressBar=new JTextField("http://");
-	String base;
+	private FileList flist;
+	private BrokenLinkList bllist;
+	private LinkSourceList lslist;
+	private JTextField adressBar=new JTextField("http://");
+	private String base;
 
-	public AdressBar(FileList f,BrokenLinkList l) {
+	public AdressBar(FileList f,BrokenLinkList b,LinkSourceList l) {
 		super(HORIZONTAL_SPLIT);
-		file=f;
-		link=l;
-		adressBar.addMouseListener(new MouseAdapter() {
+		flist=f;
+		bllist=b;
+		lslist=l;
+		adressBar.addFocusListener(new FocusAdapter() {
 			@Override
-			public void mousePressed(MouseEvent event){
+			public void focusGained(FocusEvent event){
 				adressBar.selectAll();
 			}
 		});
@@ -52,13 +54,13 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		new Thread(){
 			@Override
 			public void run(){
-				file.addPath(base);
-				searchURL(base);
+				flist.addPath(base);
+				searchURL(base,base);
 			}
 		}.start();
 	}
 
-	private void searchURL(String path){
+	private void searchURL(String path,String source){
 		System.out.println(path);
 		try {
 			URL url;
@@ -78,15 +80,16 @@ public class AdressBar extends JSplitPane implements ActionListener{
 						if(str.indexOf("<a")!=-1){
 							str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
 									str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
-							path=path.substring(0, path.lastIndexOf("/")+1)+str;
-							file.addPath(path.substring(base.length()));
-							searchURL(path);
+							String path2=path.substring(0, path.lastIndexOf("/")+1)+str;
+							flist.addPath(path2.substring(base.length()));
+							searchURL(path2,url.toString().substring(base.length()));
 						}
 					}
 					inStream.close();
 				}
 			} catch(FileNotFoundException e){
-				link.addLink(path.substring(base.length()),"ファイルが見つかりません。");
+				bllist.addLink(path.substring(base.length()),"ファイルが見つかりません。");
+				lslist.addSource(path.substring(base.length()), source);
 			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

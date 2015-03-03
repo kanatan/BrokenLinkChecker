@@ -14,7 +14,7 @@ public class BrokenLinkList extends JScrollPane {
 
 	public BrokenLinkList(LinkSourceList l) {
 		lslist=l;
-		String[] title={"URL","タイプ"};
+		String[] title={"URL","タイプ","タグ"};
 		list=new DefaultTableModel(title, 0);
 		table.setModel(list);
 		table.addMouseListener(new MouseAdapter() {
@@ -26,10 +26,11 @@ public class BrokenLinkList extends JScrollPane {
 		setViewportView(table);
 	}
 
-	public void addLink(String url,String type){
-		String[] row={url,type};
+	public void addLink(String url,String type,String tag){
+		String[] row={url,type,tag};
 		for(int n=0;n<list.getRowCount();n++){
-			if(table.getValueAt(n, 0).equals(url)){
+			if(table.getValueAt(n, 0).equals(url)&&table.getValueAt(n, 1).equals(type)
+					&&table.getValueAt(n, 2).equals(tag)){
 				return;
 			}
 		}

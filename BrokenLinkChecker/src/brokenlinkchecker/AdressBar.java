@@ -75,7 +75,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 				@Override
 				public void run(){
 					flist.addPath(adressBar.getText());
-					searchURL(url,adressBar.getText());
+					searchURL(url,adressBar.getText(),"アドレスバー");
 				}
 			}.start();
 		} catch (MalformedURLException e) {
@@ -83,7 +83,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		}
 	}
 
-	private void searchURL(URL url,String source){
+	private void searchURL(URL url,String source,String tag){
 		//System.out.println("search:"+url.toString());
 		try {
 			URLConnection connection = url.openConnection();
@@ -108,17 +108,17 @@ public class AdressBar extends JSplitPane implements ActionListener{
 									if(check.contains(path)==false){
 										flist.addPath(path.toString().substring(base.length()));
 									}
-									searchURL(path,url.toString().substring(base.length()));
+									searchURL(path,url.toString().substring(base.length()),"aタグ");
 								}
 								else{
-									bllist.addLink(path.toString(),"外部リンク：未探索");
+									bllist.addLink(path.toString(),"外部リンク：未探索","aタグ");
 									lslist.addSource(path.toString(), source);
 									//System.out.println(" pass2:"+path.toString());
 									//System.out.println();
 								}
 							} catch (MalformedURLException e) {
 								//e.printStackTrace();
-								bllist.addLink(str,str.split(":")[0]);
+								bllist.addLink(str,str.split(":")[0],"aタグ");
 								lslist.addSource(str, source);
 							}
 						}
@@ -130,7 +130,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 					//System.out.println();
 				}
 			} catch(FileNotFoundException e){
-				bllist.addLink(url.toString().substring(base.length()),"ファイルが見つかりません");
+				bllist.addLink(url.toString().substring(base.length()),"ファイルが見つかりません",tag);
 				lslist.addSource(url.toString().substring(base.length()), source);
 			}
 		} catch (IOException e) {

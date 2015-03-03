@@ -105,8 +105,12 @@ public class AdressBar extends JSplitPane implements ActionListener{
 							System.out.println();
 							if(!str.startsWith("http")){
 								flist.addPath(path2.toString().substring(base.length()));
+								searchURL(path2,url.toString().substring(base.length()));
 							}
-							searchURL(path2,url.toString().substring(base.length()));
+							else{
+								bllist.addLink(path2.toString(),"外部リンク：未探索");
+								lslist.addSource(path2.toString(), source);
+							}
 						}
 					}
 					inStream.close();
@@ -116,7 +120,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 					System.out.println();
 				}
 			} catch(FileNotFoundException e){
-				bllist.addLink(url.toString().substring(base.length()),"ファイルが見つかりません。");
+				bllist.addLink(url.toString().substring(base.length()),"ファイルが見つかりません");
 				lslist.addSource(url.toString().substring(base.length()), source);
 			}
 		} catch (MalformedURLException e) {

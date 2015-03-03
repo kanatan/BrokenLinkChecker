@@ -28,6 +28,11 @@ public class BrokenLinkList extends JScrollPane {
 
 	public void addLink(String url,String type){
 		String[] row={url,type};
+		for(int n=0;n<list.getRowCount();n++){
+			if(table.getValueAt(n, 0).equals(url)){
+				return;
+			}
+		}
 		list.addRow(row);
 	}
 }

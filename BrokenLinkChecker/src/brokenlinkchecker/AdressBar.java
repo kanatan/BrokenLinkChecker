@@ -99,24 +99,28 @@ public class AdressBar extends JSplitPane implements ActionListener{
 						if(str.indexOf("<a")!=-1){
 							str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
 									str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
-							URL path2=new URL(url,str);
-							System.out.println("   hit:"+path2);
+							URL path=new URL(url,str);
+							System.out.println("   hit:"+path);
 							System.out.println("source:"+url.toString());
 							System.out.println();
 							if(!str.startsWith("http")){
-								flist.addPath(path2.toString().substring(base.length()));
-								searchURL(path2,url.toString().substring(base.length()));
+								if(check.contains(path)==false){
+									flist.addPath(path.toString().substring(base.length()));
+								}
+								searchURL(path,url.toString().substring(base.length()));
 							}
 							else{
-								bllist.addLink(path2.toString(),"外部リンク：未探索");
-								lslist.addSource(path2.toString(), source);
+								bllist.addLink(path.toString(),"外部リンク：未探索");
+								lslist.addSource(path.toString(), source);
+								System.out.println(" pass2:"+path.toString());
+								System.out.println();
 							}
 						}
 					}
 					inStream.close();
 				}
 				else{
-					System.out.println("  pass:"+url.toString());
+					System.out.println(" pass1:"+url.toString());
 					System.out.println();
 				}
 			} catch(FileNotFoundException e){

@@ -18,12 +18,14 @@ public class FileList extends JScrollPane {
 			node.setUserObject(path);
 		}
 		else{
+			System.out.println(" path:"+path);
 			String[] fp=path.split("/");
 			int p=0;
 			DefaultMutableTreeNode node2=node;
 			while(p<fp.length){
 				int p2=p;
-				for(int n=0;n<node.getChildCount();n++){
+				for(int n=0;n<node2.getChildCount();n++){
+					System.out.println("child:"+((DefaultMutableTreeNode)node2.getChildAt(n)).getUserObject());
 					if(((DefaultMutableTreeNode)node2.getChildAt(n)).getUserObject().equals(fp[p])){
 						p++;
 						node2=(DefaultMutableTreeNode)node2.getChildAt(n);
@@ -35,6 +37,8 @@ public class FileList extends JScrollPane {
 				}
 			}
 			if(p!=fp.length){
+				System.out.println("  add:"+node2.getUserObject());
+				System.out.println();
 				for(;p<fp.length;p++){
 					DefaultMutableTreeNode node3=new DefaultMutableTreeNode(fp[p]);
 					node2.add(node3);

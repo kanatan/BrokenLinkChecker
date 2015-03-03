@@ -84,7 +84,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	}
 
 	private void searchURL(URL url,String source){
-		System.out.println("search:"+url.toString());
+		//System.out.println("search:"+url.toString());
 		try {
 			URLConnection connection = url.openConnection();
 			try{
@@ -99,36 +99,40 @@ public class AdressBar extends JSplitPane implements ActionListener{
 						if(str.indexOf("<a")!=-1){
 							str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
 									str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
-							URL path=new URL(url,str);
-							System.out.println("   hit:"+path);
-							System.out.println("source:"+url.toString());
-							System.out.println();
-							if(!str.startsWith("http")){
-								if(check.contains(path)==false){
-									flist.addPath(path.toString().substring(base.length()));
+							try {
+								URL path=new URL(url,str);
+								//System.out.println("   hit:"+path);
+								//System.out.println("source:"+url.toString());
+								//System.out.println();
+								if(!str.startsWith("http")){
+									if(check.contains(path)==false){
+										flist.addPath(path.toString().substring(base.length()));
+									}
+									searchURL(path,url.toString().substring(base.length()));
 								}
-								searchURL(path,url.toString().substring(base.length()));
-							}
-							else{
-								bllist.addLink(path.toString(),"外部リンク：未探索");
-								lslist.addSource(path.toString(), source);
-								System.out.println(" pass2:"+path.toString());
-								System.out.println();
+								else{
+									bllist.addLink(path.toString(),"外部リンク：未探索");
+									lslist.addSource(path.toString(), source);
+									//System.out.println(" pass2:"+path.toString());
+									//System.out.println();
+								}
+							} catch (MalformedURLException e) {
+								//e.printStackTrace();
+								bllist.addLink(str,str.split(":")[0]);
+								lslist.addSource(str, source);
 							}
 						}
 					}
 					inStream.close();
 				}
 				else{
-					System.out.println(" pass1:"+url.toString());
-					System.out.println();
+					//System.out.println(" pass1:"+url.toString());
+					//System.out.println();
 				}
 			} catch(FileNotFoundException e){
 				bllist.addLink(url.toString().substring(base.length()),"ファイルが見つかりません");
 				lslist.addSource(url.toString().substring(base.length()), source);
 			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

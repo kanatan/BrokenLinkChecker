@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Vector;
@@ -54,35 +53,45 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	public void actionPerformed(ActionEvent event) {
 		base=adressBar.getText();
 		if(base.indexOf("\\")!=-1){
-			base=base.substring(0, base.lastIndexOf("\\")+1);
+			if(base.startsWith("file")){
+				base=base.substring(0, base.lastIndexOf("\\")+1);
+			}
+			else{
+				base="file:/"+base.substring(0, base.lastIndexOf("\\")+1);
+			}
 		}
 		else{
 			base=base.substring(0, base.lastIndexOf("/")+1);
 		}
-		new Thread(){
-			@Override
-			public void run(){
-				flist.addPath(adressBar.getText());
-				searchURL(adressBar.getText(),adressBar.getText());
-			}
-		}.start();
-	}
-
-	private void searchURL(String path,String source){
-		System.out.println("search:"+path);
 		try {
 			URL url;
-			if(path.startsWith("http") || path.startsWith("file")){
-				url=new URL(new URL(base),path.substring(base.length()));
+			if(base.startsWith("file")){
+				url=new URL(new URL(base),adressBar.getText().substring(adressBar.getText().lastIndexOf("\\")+1));
 			}
 			else{
-				url=new URL(new URL("file:///"+base),path.substring(base.length()));
+				url=new URL(new URL(base),adressBar.getText().substring(base.length()));
 			}
+			new Thread(){
+				@Override
+				public void run(){
+					flist.addPath(adressBar.getText());
+					searchURL(url,adressBar.getText());
+				}
+			}.start();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void searchURL(URL url,String source){
+		System.out.println("search:"+url.toString());
+		try {
 			URLConnection connection = url.openConnection();
 			try{
 				InputStream inStream = connection.getInputStream();
 				if(check.contains(url)==false &&
-						(path.endsWith("html") || path.endsWith("htm") || path.endsWith("/"))){
+						(url.toString().endsWith("html") || url.toString().endsWith("htm") ||
+								url.toString().endsWith("/"))){
 					check.add(url);
 					BufferedReader input =new BufferedReader(new InputStreamReader(inStream));
 					String str="";
@@ -90,11 +99,13 @@ public class AdressBar extends JSplitPane implements ActionListener{
 						if(str.indexOf("<a")!=-1){
 							str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
 									str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
-							String path2=path.substring(0, path.lastIndexOf("/")+1)+str;
-							flist.addPath(path2.substring(base.length()));
+							URL path2=new URL(url,str);
 							System.out.println("   hit:"+path2);
 							System.out.println("source:"+url.toString());
 							System.out.println();
+							if(!str.startsWith("http")){
+								flist.addPath(path2.toString().substring(base.length()));
+							}
 							searchURL(path2,url.toString().substring(base.length()));
 						}
 					}
@@ -105,8 +116,8 @@ public class AdressBar extends JSplitPane implements ActionListener{
 					System.out.println();
 				}
 			} catch(FileNotFoundException e){
-				bllist.addLink(path.substring(base.length()),"ファイルが見つかりません。");
-				lslist.addSource(path.substring(base.length()), source);
+				bllist.addLink(url.toString().substring(base.length()),"ファイルが見つかりません。");
+				lslist.addSource(url.toString().substring(base.length()), source);
 			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

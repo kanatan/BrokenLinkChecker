@@ -26,6 +26,21 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	private JTextField adressBar=new JTextField("http://");
 	private String base;
 	private Vector<URL> check=new Vector<URL>();
+	class Search{
+		String start;
+		String path;
+		String end;
+		String tag;
+
+		Search(String s,String p,String e,String t){
+			start=s;
+			path=p;
+			end=e;
+			tag=t;
+		}
+	}
+	Search[] search=new Search[6];
+
 
 	public AdressBar(FileList f,BrokenLinkList b,LinkSourceList l) {
 		super(HORIZONTAL_SPLIT);
@@ -47,6 +62,12 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		setRightComponent(go);
 		setDividerLocation(550);
 		setDividerSize(0);
+		search[0]=new Search("<a ", "href=\"","\"", "aタグ");
+		search[1]=new Search("<img ", "src=\"","\"", "imgタグ");
+		search[2]=new Search("<img ", "this.src'","'", "imgタグ");
+		search[3]=new Search("<iframe ", "href=\"","\"", "iframeタグ");
+		search[4]=new Search("<link ", "href=\"","\"", "linkタグ");
+		search[5]=new Search("<script ", "src=\"","\"", "scriptタグ");
 	}
 
 	@Override
@@ -94,36 +115,53 @@ public class AdressBar extends JSplitPane implements ActionListener{
 								url.toString().endsWith("/"))){
 					check.add(url);
 					BufferedReader input =new BufferedReader(new InputStreamReader(inStream));
-					String str="";
-					while((str=input.readLine())!=null){
-						if(str.indexOf("<a")!=-1){
-							str=str.substring(str.indexOf("href=\"")+"href=\"".length(),
-									str.indexOf("\"",str.indexOf("href=\"")+"href=\"".length()));
-							try {
-								URL path=new URL(url,str);
-								//System.out.println("   hit:"+path);
-								//System.out.println("source:"+url.toString());
-								//System.out.println();
-								if(!str.startsWith("http")){
-									if(check.contains(path)==false){
-										flist.addPath(path.toString().substring(base.length()));
-									}
-									searchURL(path,url.toString().substring(base.length()),"aタグ");
-								}
-								else{
-									bllist.addLink(path.toString(),"外部リンク：未探索","aタグ");
-									lslist.addSource(path.toString(), source);
-									//System.out.println(" pass2:"+path.toString());
-									//System.out.println();
-								}
-							} catch (MalformedURLException e) {
-								//e.printStackTrace();
-								bllist.addLink(str,str.split(":")[0],"aタグ");
-								lslist.addSource(str, source);
-							}
+					String html="";
+					{
+						String str="";
+						while((str=input.readLine())!=null){
+							html+=str;
 						}
 					}
 					inStream.close();
+					while(true){
+						int n=html.indexOf("<");
+						if(n==-1){
+							break;
+						}
+						html=html.substring(n);
+						if((n=checkStart(html))!=-1){
+							if(n==1){
+								;
+							}
+							else{
+								String p=html.substring(html.indexOf(search[n].path)+search[n].path.length(),
+										html.indexOf(search[n].end,html.indexOf(search[n].path)+search[n].path.length()));
+								try {
+									URL path=new URL(url,p);
+									//System.out.println("   hit:"+path);
+									//System.out.println("source:"+url.toString());
+									//System.out.println();
+									if(!p.startsWith("http")){
+										if(check.contains(path)==false){
+											flist.addPath(path.toString().substring(base.length()));
+										}
+										searchURL(path,url.toString().substring(base.length()),search[n].tag);
+									}
+									else{
+										bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
+										lslist.addSource(path.toString(), source);
+										//System.out.println(" pass2:"+path.toString());
+										//System.out.println();
+									}
+								} catch (MalformedURLException e) {
+									//e.printStackTrace();
+									bllist.addLink(html,html.split(":")[n],search[n].tag);
+									lslist.addSource(html, source);
+								}
+							}
+						}
+						html=html.substring(html.indexOf(">"));
+					}
 				}
 				else{
 					//System.out.println(" pass1:"+url.toString());
@@ -136,5 +174,14 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private int checkStart(String html){
+		for(int n=0;n<search.length;n++){
+			if(html.startsWith(search[n].start)){
+				return n;
+			}
+		}
+		return -1;
 	}
 }

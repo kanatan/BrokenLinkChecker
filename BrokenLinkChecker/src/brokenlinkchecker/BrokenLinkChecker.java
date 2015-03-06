@@ -21,7 +21,7 @@ public class BrokenLinkChecker extends JFrame {
 		pane2.setDividerLocation(200);
 		pane2.setDividerSize(1);
 		add(pane2);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 	}
 

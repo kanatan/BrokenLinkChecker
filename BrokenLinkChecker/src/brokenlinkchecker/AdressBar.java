@@ -16,6 +16,7 @@ import java.net.URLConnection;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
@@ -27,10 +28,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 	private String base;
 	private Vector<URL> check=new Vector<URL>();
 	class Search{
-		String start;
-		String path;
-		String end;
-		String tag;
+		String start,path,end,tag;
 
 		Search(String s,String p,String e,String t){
 			start=s;
@@ -40,6 +38,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		}
 	}
 	Search[] search=new Search[6];
+	int fcount=0,bcount=0,gcount=0;
 
 
 	public AdressBar(FileList f,BrokenLinkList b,LinkSourceList l) {
@@ -97,6 +96,9 @@ public class AdressBar extends JSplitPane implements ActionListener{
 				public void run(){
 					flist.addPath(adressBar.getText());
 					searchURL(url,adressBar.getText(),"アドレスバー");
+					JOptionPane.showMessageDialog(null, "　ファイル数："+fcount+"\n"
+							+"リンク切れ数："+bcount+"\n"
+							+"外部リンク数："+gcount, "リンク切れチェッカー", JOptionPane.PLAIN_MESSAGE);
 				}
 			}.start();
 		} catch (MalformedURLException e) {
@@ -146,17 +148,19 @@ public class AdressBar extends JSplitPane implements ActionListener{
 											flist.addPath(path.toString().substring(base.length()));
 										}
 										searchURL(path,url.toString().substring(base.length()),search[n].tag);
+										fcount++;
 									}
 									else{
 										bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
 										lslist.addSource(path.toString(), source);
+										gcount++;
 										//System.out.println(" pass2:"+path.toString());
 										//System.out.println();
 									}
 								} catch (MalformedURLException e) {
 									//e.printStackTrace();
-									bllist.addLink(html,html.split(":")[n],search[n].tag);
-									lslist.addSource(html, source);
+									bllist.addLink(p,p.split(":")[0],search[n].tag);
+									lslist.addSource(p, source);
 								}
 							}
 						}
@@ -170,6 +174,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 			} catch(FileNotFoundException e){
 				bllist.addLink(url.toString().substring(base.length()),"ファイルが見つかりません",tag);
 				lslist.addSource(url.toString().substring(base.length()), source);
+				bcount++;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

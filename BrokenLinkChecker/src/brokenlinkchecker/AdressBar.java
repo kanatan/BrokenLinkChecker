@@ -37,7 +37,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 			tag=t;
 		}
 	}
-	Search[] search=new Search[6];
+	Search[] search=new Search[5];
 	int fcount=0,bcount=0,gcount=0;
 
 
@@ -63,10 +63,9 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		setDividerSize(0);
 		search[0]=new Search("<a ", "href=\"","\"", "aタグ");
 		search[1]=new Search("<img ", "src=\"","\"", "imgタグ");
-		search[2]=new Search("<img ", "this.src'","'", "imgタグ");
-		search[3]=new Search("<iframe ", "href=\"","\"", "iframeタグ");
-		search[4]=new Search("<link ", "href=\"","\"", "linkタグ");
-		search[5]=new Search("<script ", "src=\"","\"", "scriptタグ");
+		search[2]=new Search("<iframe ", "href=\"","\"", "iframeタグ");
+		search[3]=new Search("<link ", "href=\"","\"", "linkタグ");
+		search[4]=new Search("<script ", "src=\"","\"", "scriptタグ");
 	}
 
 	@Override
@@ -133,34 +132,66 @@ public class AdressBar extends JSplitPane implements ActionListener{
 						html=html.substring(n);
 						if((n=checkStart(html))!=-1){
 							if(n==1){
-								;
+								while(html.indexOf(search[n].path)!=-1 && html.indexOf(search[n].path)<html.indexOf(">")){
+									String p=html.substring(html.indexOf(search[n].path)+search[n].path.length(),
+											html.indexOf(search[n].end,html.indexOf(search[n].path)+search[n].path.length()));
+									try {
+										URL path=new URL(url,p);
+										System.out.println("   hit:"+path.toString());
+										System.out.println("source:"+url.toString());
+										System.out.println("  html:"+html);
+										System.out.println();
+										if(!p.startsWith("http")){
+											if(check.contains(path)==false){
+												flist.addPath(path.toString().substring(base.length()));
+											}
+											searchURL(path,url.toString().substring(base.length()),search[n].tag);
+											fcount++;
+										}
+										else{
+											bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
+											lslist.addSource(path.toString(), source);
+											gcount++;
+											//System.out.println(" pass2:"+path.toString());
+											//System.out.println();
+										}
+									} catch (MalformedURLException e) {
+										//e.printStackTrace();
+										bllist.addLink(p,p.split(":")[0],search[n].tag);
+										lslist.addSource(p, source);
+									}
+									html=html.substring(p.length());
+								}
 							}
 							else{
-								String p=html.substring(html.indexOf(search[n].path)+search[n].path.length(),
-										html.indexOf(search[n].end,html.indexOf(search[n].path)+search[n].path.length()));
-								try {
-									URL path=new URL(url,p);
-									//System.out.println("   hit:"+path);
-									//System.out.println("source:"+url.toString());
-									//System.out.println();
-									if(!p.startsWith("http")){
-										if(check.contains(path)==false){
-											flist.addPath(path.toString().substring(base.length()));
+								if(html.indexOf(search[n].path)!=-1 && html.indexOf(search[n].path)<html.indexOf(">")){
+									String p=html.substring(html.indexOf(search[n].path)+search[n].path.length(),
+											html.indexOf(search[n].end,html.indexOf(search[n].path)+search[n].path.length()));
+									try {
+										URL path=new URL(url,p);
+										System.out.println("   hit:"+path.toString());
+										System.out.println("source:"+url.toString());
+										System.out.println("  html:"+html);
+										System.out.println();
+										if(!p.startsWith("http")){
+											if(check.contains(path)==false){
+												flist.addPath(path.toString().substring(base.length()));
+											}
+											searchURL(path,url.toString().substring(base.length()),search[n].tag);
+											fcount++;
 										}
-										searchURL(path,url.toString().substring(base.length()),search[n].tag);
-										fcount++;
+										else{
+											bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
+											lslist.addSource(path.toString(), source);
+											gcount++;
+											//System.out.println(" pass2:"+path.toString());
+											//System.out.println();
+										}
+									} catch (MalformedURLException e) {
+										//e.printStackTrace();
+										bllist.addLink(p,p.split(":")[0],search[n].tag);
+										lslist.addSource(p, source);
 									}
-									else{
-										bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
-										lslist.addSource(path.toString(), source);
-										gcount++;
-										//System.out.println(" pass2:"+path.toString());
-										//System.out.println();
-									}
-								} catch (MalformedURLException e) {
-									//e.printStackTrace();
-									bllist.addLink(p,p.split(":")[0],search[n].tag);
-									lslist.addSource(p, source);
 								}
 							}
 						}

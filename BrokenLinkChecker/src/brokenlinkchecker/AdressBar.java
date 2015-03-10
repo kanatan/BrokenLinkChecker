@@ -98,7 +98,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 			new Thread(){
 				@Override
 				public void run(){
-					flist.addPath(adressBar.getText());
+					fcount+=flist.addPath(adressBar.getText());
 					searchURL(url,adressBar.getText(),"アドレスバー");
 					JOptionPane.showMessageDialog(null, "　ファイル数："+fcount+"\n"
 							+"リンク切れ数："+bcount+"\n"
@@ -145,16 +145,15 @@ public class AdressBar extends JSplitPane implements ActionListener{
 													+search[n].path.length()));
 									try {
 										URL path=new URL(url,p);
-										//System.out.println("   hit:"+path.toString());
+										System.out.println("   hit:"+path.toString());
 										//System.out.println("source:"+url.toString());
 										//System.out.println("  html:"+html);
 										//System.out.println();
 										if(!p.startsWith("http")){
 											if(check.contains(path)==false){
-												flist.addPath(path.toString().substring(base.length()));
+												fcount+=flist.addPath(path.toString().substring(base.length()));
 											}
 											searchURL(path,url.toString().substring(base.length()),search[n].tag);
-											fcount++;
 										}
 										else{
 											bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
@@ -186,10 +185,9 @@ public class AdressBar extends JSplitPane implements ActionListener{
 										//System.out.println();
 										if(!p.startsWith("http")){
 											if(check.contains(path)==false){
-												flist.addPath(path.toString().substring(base.length()));
+												fcount+=flist.addPath(path.toString().substring(base.length()));
 											}
 											searchURL(path,url.toString().substring(base.length()),search[n].tag);
-											fcount++;
 										}
 										else{
 											bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);

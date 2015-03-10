@@ -13,7 +13,8 @@ public class FileList extends JScrollPane {
 		setViewportView(tree);
 	}
 
-	public void addPath(String path){
+	public int addPath(String path){
+		int add=0;
 		if(node.getUserObject().equals("URLを指定してください。")){
 			node.setUserObject(path);
 		}
@@ -47,8 +48,10 @@ public class FileList extends JScrollPane {
 					node2.add(node3);
 					node2=node3;
 				}
+				add=1;
 			}
 		}
 		((DefaultTreeModel)tree.getModel()).reload();
+		return add;
 	}
 }

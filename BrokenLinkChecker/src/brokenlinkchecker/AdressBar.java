@@ -85,7 +85,12 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		try {
 			URL url;
 			if(base.startsWith("file")){
-				url=new URL(new URL(base),adressBar.getText().substring(adressBar.getText().lastIndexOf("\\")+1));
+				if(base.indexOf("\\")!=-1){
+					url=new URL(new URL(base),adressBar.getText().substring(adressBar.getText().lastIndexOf("\\")+1));
+				}
+				else{
+					url=new URL(new URL(base),adressBar.getText().substring(adressBar.getText().lastIndexOf("/")+1));
+				}
 			}
 			else{
 				url=new URL(new URL(base),adressBar.getText().substring(base.length()));
@@ -131,16 +136,19 @@ public class AdressBar extends JSplitPane implements ActionListener{
 						}
 						html=html.substring(n);
 						if((n=checkStart(html))!=-1){
-							if(n==1){
-								while(html.indexOf(search[n].path)!=-1 && html.indexOf(search[n].path)<html.indexOf(">")){
-									String p=html.substring(html.indexOf(search[n].path)+search[n].path.length(),
-											html.indexOf(search[n].end,html.indexOf(search[n].path)+search[n].path.length()));
+							if(n<6){
+								while(html.indexOf(search[n].path)!=-1
+										&& html.indexOf(search[n].path)<html.indexOf(">")){
+									String p=html.substring(html.indexOf(search[n].path)
+											+search[n].path.length(),
+											html.indexOf(search[n].end,html.indexOf(search[n].path)
+													+search[n].path.length()));
 									try {
 										URL path=new URL(url,p);
-										System.out.println("   hit:"+path.toString());
-										System.out.println("source:"+url.toString());
-										System.out.println("  html:"+html);
-										System.out.println();
+										//System.out.println("   hit:"+path.toString());
+										//System.out.println("source:"+url.toString());
+										//System.out.println("  html:"+html);
+										//System.out.println();
 										if(!p.startsWith("http")){
 											if(check.contains(path)==false){
 												flist.addPath(path.toString().substring(base.length()));
@@ -164,15 +172,18 @@ public class AdressBar extends JSplitPane implements ActionListener{
 								}
 							}
 							else{
-								if(html.indexOf(search[n].path)!=-1 && html.indexOf(search[n].path)<html.indexOf(">")){
-									String p=html.substring(html.indexOf(search[n].path)+search[n].path.length(),
-											html.indexOf(search[n].end,html.indexOf(search[n].path)+search[n].path.length()));
+								if(html.indexOf(search[n].path)!=-1
+										&& html.indexOf(search[n].path)<html.indexOf(">")){
+									String p=html.substring(html.indexOf(search[n].path)
+											+search[n].path.length(),
+											html.indexOf(search[n].end,html.indexOf(search[n].path)
+													+search[n].path.length()));
 									try {
 										URL path=new URL(url,p);
-										System.out.println("   hit:"+path.toString());
-										System.out.println("source:"+url.toString());
-										System.out.println("  html:"+html);
-										System.out.println();
+										//System.out.println("   hit:"+path.toString());
+										//System.out.println("source:"+url.toString());
+										//System.out.println("  html:"+html);
+										//System.out.println();
 										if(!p.startsWith("http")){
 											if(check.contains(path)==false){
 												flist.addPath(path.toString().substring(base.length()));
@@ -192,6 +203,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 										bllist.addLink(p,p.split(":")[0],search[n].tag);
 										lslist.addSource(p, source);
 									}
+									html=html.substring(p.length());
 								}
 							}
 						}

@@ -18,6 +18,9 @@ public class FileList extends JScrollPane {
 			node.setUserObject(path);
 		}
 		else{
+			if(path.equals("") || path.endsWith("/")){
+				path+="index.html";
+			}
 			//System.out.println(" path:"+path);
 			String[] fp=path.split("/");
 			int p=0;

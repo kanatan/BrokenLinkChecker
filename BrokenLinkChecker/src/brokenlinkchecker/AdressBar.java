@@ -136,73 +136,37 @@ public class AdressBar extends JSplitPane implements ActionListener{
 						}
 						html=html.substring(n);
 						if((n=checkStart(html))!=-1){
-							if(n<6){
-								while(html.indexOf(search[n].path)!=-1
-										&& html.indexOf(search[n].path)<html.indexOf(">")){
-									String p=html.substring(html.indexOf(search[n].path)
-											+search[n].path.length(),
-											html.indexOf(search[n].end,html.indexOf(search[n].path)
-													+search[n].path.length()));
-									try {
-										URL path=new URL(url,p);
-										System.out.println("   hit:"+path.toString());
-										//System.out.println("source:"+url.toString());
-										//System.out.println("  html:"+html);
-										//System.out.println();
-										if(!p.startsWith("http")){
-											if(check.contains(path)==false){
-												fcount+=flist.addPath(path.toString().substring(base.length()));
-											}
-											searchURL(path,url.toString().substring(base.length()),search[n].tag);
+							while(html.indexOf(search[n].path)!=-1
+									&& html.indexOf(search[n].path)<html.indexOf(">")){
+								String p=html.substring(html.indexOf(search[n].path)
+										+search[n].path.length(),
+										html.indexOf(search[n].end,html.indexOf(search[n].path)
+												+search[n].path.length()));
+								try {
+									URL path=new URL(url,p);
+									System.out.println("   hit:"+path.toString());
+									//System.out.println("source:"+url.toString());
+									//System.out.println("  html:"+html);
+									//System.out.println();
+									if(!p.startsWith("http")){
+										if(check.contains(path)==false){
+											fcount+=flist.addPath(path.toString().substring(base.length()));
 										}
-										else{
-											bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
-											lslist.addSource(path.toString(), source);
-											gcount++;
-											//System.out.println(" pass2:"+path.toString());
-											//System.out.println();
-										}
-									} catch (MalformedURLException e) {
-										//e.printStackTrace();
-										bllist.addLink(p,p.split(":")[0],search[n].tag);
-										lslist.addSource(p, source);
+										searchURL(path,url.toString().substring(base.length()),search[n].tag);
 									}
-									html=html.substring(p.length());
-								}
-							}
-							else{
-								if(html.indexOf(search[n].path)!=-1
-										&& html.indexOf(search[n].path)<html.indexOf(">")){
-									String p=html.substring(html.indexOf(search[n].path)
-											+search[n].path.length(),
-											html.indexOf(search[n].end,html.indexOf(search[n].path)
-													+search[n].path.length()));
-									try {
-										URL path=new URL(url,p);
-										//System.out.println("   hit:"+path.toString());
-										//System.out.println("source:"+url.toString());
-										//System.out.println("  html:"+html);
+									else{
+										bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
+										lslist.addSource(path.toString(), source);
+										gcount++;
+										//System.out.println(" pass2:"+path.toString());
 										//System.out.println();
-										if(!p.startsWith("http")){
-											if(check.contains(path)==false){
-												fcount+=flist.addPath(path.toString().substring(base.length()));
-											}
-											searchURL(path,url.toString().substring(base.length()),search[n].tag);
-										}
-										else{
-											bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
-											lslist.addSource(path.toString(), source);
-											gcount++;
-											//System.out.println(" pass2:"+path.toString());
-											//System.out.println();
-										}
-									} catch (MalformedURLException e) {
-										//e.printStackTrace();
-										bllist.addLink(p,p.split(":")[0],search[n].tag);
-										lslist.addSource(p, source);
 									}
-									html=html.substring(p.length());
+								} catch (MalformedURLException e) {
+									//e.printStackTrace();
+									bllist.addLink(p,p.split(":")[0],search[n].tag);
+									lslist.addSource(p, source);
 								}
+								html=html.substring(p.length());
 							}
 						}
 						html=html.substring(html.indexOf(">"));

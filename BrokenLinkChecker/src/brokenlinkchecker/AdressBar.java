@@ -38,7 +38,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 		}
 	}
 	Search[] search=new Search[5];
-	int fcount=0,bcount=0,gcount=0;
+	int fcount=0,bcount=0,ecount=0;
 
 
 	public AdressBar(FileList f,BrokenLinkList b,LinkSourceList l) {
@@ -102,7 +102,13 @@ public class AdressBar extends JSplitPane implements ActionListener{
 					searchURL(url,adressBar.getText(),"アドレスバー");
 					JOptionPane.showMessageDialog(null, "　ファイル数："+fcount+"\n"
 							+"リンク切れ数："+bcount+"\n"
-							+"外部リンク数："+gcount, "リンク切れチェッカー", JOptionPane.PLAIN_MESSAGE);
+							+"外部リンク数："+ecount, "リンク切れチェッカー",
+							JOptionPane.INFORMATION_MESSAGE);
+					if(JOptionPane.showConfirmDialog(null, "外部リンクを探索しますか？",
+							"リンク切れチェッカー",JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE)==JOptionPane.YES_OPTION){
+						bllist.checkExternalLinks();
+					}
 				}
 			}.start();
 		} catch (MalformedURLException e) {
@@ -144,7 +150,7 @@ public class AdressBar extends JSplitPane implements ActionListener{
 												+search[n].path.length()));
 								try {
 									URL path=new URL(url,p);
-									System.out.println("   hit:"+path.toString());
+									//System.out.println("   hit:"+path.toString());
 									//System.out.println("source:"+url.toString());
 									//System.out.println("  html:"+html);
 									//System.out.println();
@@ -155,11 +161,12 @@ public class AdressBar extends JSplitPane implements ActionListener{
 										searchURL(path,url.toString().substring(base.length()),search[n].tag);
 									}
 									else{
-										bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
-										lslist.addSource(path.toString(), source);
-										gcount++;
-										//System.out.println(" pass2:"+path.toString());
-										//System.out.println();
+										if(check.contains(path)==false){
+											ecount+=bllist.addLink(path.toString(),"外部リンク：未探索",search[n].tag);
+											lslist.addSource(path.toString(), source);
+											//System.out.println(" pass2:"+path.toString());
+											//System.out.println();
+										}
 									}
 								} catch (MalformedURLException e) {
 									//e.printStackTrace();

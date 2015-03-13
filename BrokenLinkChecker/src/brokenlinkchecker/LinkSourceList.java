@@ -1,5 +1,6 @@
 package brokenlinkchecker;
 
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -8,6 +9,11 @@ import javax.swing.JScrollPane;
 
 public class LinkSourceList extends JScrollPane {
 	private JList<String> list=new JList<String>();
+	class LinkSource{
+		String url;
+		String path;
+		Point location;
+	}
 	private HashMap<String,Vector<String>> map=new HashMap<String, Vector<String>>();
 
 	public LinkSourceList() {
